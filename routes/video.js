@@ -67,10 +67,31 @@ const router = express.Router()
 // GET /video/all-videos
 router.get('/all-videos', (req, res) => {
     const { courseId } = req.query
+<<<<<<< HEAD
+    const sql = "SELECT * FROM videos WHERE course_id=?"
+    pool.query(sql, [courseId], (error, data) => {
+        res.send(result.createResult(error, data))
+    })
+})
+
+// POST /video/add
+router.post('/add', (req, res) => {
+    const { courseId, title, youtubeURL, description } = req.body
+    const sql = `
+        INSERT INTO videos(course_id, title, youtube_url, description, added_at)
+        VALUES (?,?,?,?,CURDATE())
+    `
+    pool.query(sql,
+        [courseId, title, youtubeURL, description],
+        (error, data) => {
+            res.send(result.createResult(error, data))
+        }
+=======
     pool.query(
         "SELECT * FROM videos WHERE course_id = ?",
         [courseId],
         (error, data) => res.send(result.createResult(error, data))
+>>>>>>> 4dd5788aee5d2f561c49c12e2fb64138de44df0c
     )
 })
 
