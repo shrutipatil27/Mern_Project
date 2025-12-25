@@ -7,7 +7,7 @@ const router = express.Router()
 // GET /video/all-videos
 router.get('/all-videos', (req, res) => {
     const { courseId } = req.query
-    const sql = SELECT * FROM videos WHERE course_id=?
+    const sql = "SELECT * FROM videos WHERE course_id=?"
     pool.query(sql, [courseId], (error, data) => {
         res.send(result.createResult(error, data))
     })
@@ -49,7 +49,7 @@ router.put('/update/:videoId', (req, res) => {
 // DELETE /video/delete/:videoId
 router.delete('/delete/:videoId', (req, res) => {
     pool.query(
-        DELETE FROM videos WHERE video_id=?,
+        "DELETE FROM videos WHERE video_id=?",
         [req.params.videoId],
         (error, data) => {
             res.send(result.createResult(error, data))
