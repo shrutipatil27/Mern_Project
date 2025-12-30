@@ -125,6 +125,54 @@
 
 // module.exports = router
 
+// const express = require('express')
+// const pool = require('../db/pool')
+// const result = require('../utils/result')
+// const { authorizeRoles } = require('../utils/auth')
+
+// const router = express.Router()
+
+// router.get('/all-videos', (req, res) => {
+//     const { courseId } = req.query
+//     pool.query(
+//         `SELECT * FROM videos WHERE course_id=?`,
+//         [courseId],
+//         (error, data) => res.send(result.createResult(error, data))
+//     )
+// })
+
+// router.post('/add', authorizeRoles('ADMIN'), (req, res) => {
+//     const { courseId, title, youtubeURL, description } = req.body
+
+//     pool.query(
+//         `INSERT INTO videos(course_id,title,youtube_url,description,added_at)
+//          VALUES (?,?,?,?,CURDATE())`,
+//         [courseId, title, youtubeURL, description],
+//         (error, data) => res.send(result.createResult(error, data))
+//     )
+// })
+
+// router.put('/update/:videoId', authorizeRoles('ADMIN'), (req, res) => {
+//     const { videoId } = req.params
+//     const { courseId, title, youtubeURL, description } = req.body
+
+//     pool.query(
+//         `UPDATE videos SET course_id=?,title=?,youtube_url=?,description=? WHERE video_id=?`,
+//         [courseId, title, youtubeURL, description, videoId],
+//         (error, data) => res.send(result.createResult(error, data))
+//     )
+// })
+
+// router.delete('/delete/:videoId', authorizeRoles('ADMIN'), (req, res) => {
+//     pool.query(
+//         `DELETE FROM videos WHERE video_id=?`,
+//         [req.params.videoId],
+//         (error, data) => res.send(result.createResult(error, data))
+//     )
+// })
+
+// module.exports = router
+
 const express = require('express')
 const pool = require('../db/pool')
 const result = require('../utils/result')
@@ -132,43 +180,60 @@ const { authorizeRoles } = require('../utils/auth')
 
 const router = express.Router()
 
+// GET ALL VIDEOS (ADMIN)
 router.get('/all-videos', (req, res) => {
-    const { courseId } = req.query
-    pool.query(
-        `SELECT * FROM videos WHERE course_id=?`,
-        [courseId],
-        (error, data) => res.send(result.createResult(error, data))
-    )
+  pool.query(
+    `SELECT * FROM videos`,
+    (error, data) => res.send(result.createResult(error, data))
+  )
 })
 
+// ADD VIDEO (ADMIN)
 router.post('/add', authorizeRoles('ADMIN'), (req, res) => {
-    const { courseId, title, youtubeURL, description } = req.body
+  const { course_id, title, description, youtube_url } = req.body
 
-    pool.query(
-        `INSERT INTO videos(course_id,title,youtube_url,description,added_at)
-         VALUES (?,?,?,?,CURDATE())`,
-        [courseId, title, youtubeURL, description],
-        (error, data) => res.send(result.createResult(error, data))
-    )
+  pool.query(
+    `INSERT INTO videos(course_id, title, youtube_url, description, added_at)
+     VALUES (?,?,?,?,CURDATE())`,
+    [course_id, title, youtube_url, description], // ✅ FIXED ORDER
+    (error, data) => res.send(result.createResult(error, data))
+  )
 })
 
-router.put('/update/:videoId', authorizeRoles('ADMIN'), (req, res) => {
-    const { videoId } = req.params
-    const { courseId, title, youtubeURL, description } = req.body
+// UPDATE VIDEO (ADMIN)
+router.put('/update/:video_id', authorizeRoles('ADMIN'), (req, res) => {
+  const { video_id } = req.params
+  const { course_id, title, description, youtube_url } = req.body
 
-    pool.query(
-        `UPDATE videos SET course_id=?,title=?,youtube_url=?,description=? WHERE video_id=?`,
-        [courseId, title, youtubeURL, description, videoId],
-        (error, data) => res.send(result.createResult(error, data))
-    )
+  pool.query(
+    `UPDATE videos 
+     SET course_id=?, title=?, youtube_url=?, description=? 
+     WHERE video_id=?`,
+    [course_id, title, youtube_url, description, video_id],
+    (error, data) => res.send(result.createResult(error, data))
+  )
 })
 
-router.delete('/delete/:videoId', authorizeRoles('ADMIN'), (req, res) => {
-    pool.query(
-        `DELETE FROM videos WHERE video_id=?`,
-        [req.params.videoId],
-        (error, data) => res.send(result.createResult(error, data))
-    )
+// DELETE VIDEO (ADMIN)
+router.delete('/delete/:video_id', authorizeRoles('ADMIN'), (req, res) => {
+  pool.query(
+    `DELETE FROM videos WHERE video_id=?`,
+    [req.params.video_id],
+    (error, data) => res.send(result.createResult(error, data))
+  )
+})
+
+// GET VIDEO BY ID
+router.get('/:id', (req, res) => {
+  const sql = `SELECT * FROM videos WHERE video_id=?`
+
+  pool.query(sql, [req.params.id], (error, data) => {
+    if (error) {
+      res.status(500).send({ status: 'error', error: error.message })
+    } else {
+      res.send({ status: 'success', data })
+    }
+  })
 })
 
 module.exports = router
