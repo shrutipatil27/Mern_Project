@@ -172,7 +172,7 @@ router.put('/update/:video_id', authorizeRoles('ADMIN'), (req, res) => {
         [courseId, title, youtubeURL, description, videoId],
         (error, data) => res.send(result.createResult(error, data))
     )
-})
+
 
 router.delete('/delete/:videoId', authorizeRoles('ADMIN'), (req, res) => {
     pool.query(
