@@ -52,7 +52,34 @@
 // })
 
 
+// const express = require('express')
+// const { authUser, login } = require('./utils/auth')
+
+// const studentRouter = require('./routes/student')
+// const courseRouter = require('./routes/course')
+// const videoRouter = require('./routes/video')
+// const adminRouter = require('./routes/admin')
+
+// const app = express()
+// app.use(express.json())
+
+// app.use(authUser)
+
+// app.post('/auth/login', login)
+
+// app.use('/student', studentRouter)
+// app.use('/course', courseRouter)
+// app.use('/video', videoRouter)
+// app.use('/admin', adminRouter)
+
+// app.listen(4000, () => {
+//     console.log('Server running on port 4000')
+// })
+
+
 const express = require('express')
+const cors = require('cors');
+const app = express()
 const { authUser, login } = require('./utils/auth')
 
 const studentRouter = require('./routes/student')
@@ -60,8 +87,12 @@ const courseRouter = require('./routes/course')
 const videoRouter = require('./routes/video')
 const adminRouter = require('./routes/admin')
 
-const app = express()
+
+
+app.use(cors()); // This allows your React app to access the API  
 app.use(express.json())
+
+
 
 app.use(authUser)
 
@@ -72,6 +103,6 @@ app.use('/course', courseRouter)
 app.use('/video', videoRouter)
 app.use('/admin', adminRouter)
 
-app.listen(4000, () => {
+app.listen(4000,'0.0.0.0' ,() => {
     console.log('Server running on port 4000')
 })
