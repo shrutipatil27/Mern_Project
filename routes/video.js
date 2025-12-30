@@ -141,20 +141,31 @@ router.get('/all-videos', (req, res) => {
     )
 })
 
+// ADD VIDEO (ADMIN)
 router.post('/add', authorizeRoles('ADMIN'), (req, res) => {
-    const { courseId, title, youtubeURL, description } = req.body
+  const { course_id, title, description, youtube_url } = req.body
 
-    pool.query(
-        `INSERT INTO videos(course_id,title,youtube_url,description,added_at)
-         VALUES (?,?,?,?,CURDATE())`,
-        [courseId, title, youtubeURL, description],
-        (error, data) => res.send(result.createResult(error, data))
-    )
+  pool.query(
+    `INSERT INTO videos(course_id, title, youtube_url, description, added_at)
+     VALUES (?,?,?,?,CURDATE())`,
+    [course_id, title, youtube_url, description], // ✅ FIXED ORDER
+    (error, data) => res.send(result.createResult(error, data))
+  )
 })
 
-router.put('/update/:videoId', authorizeRoles('ADMIN'), (req, res) => {
-    const { videoId } = req.params
-    const { courseId, title, youtubeURL, description } = req.body
+// UPDATE VIDEO (ADMIN)
+router.put('/update/:video_id', authorizeRoles('ADMIN'), (req, res) => {
+  const { video_id } = req.params
+  const { course_id, title, description, youtube_url } = req.body
+
+  pool.query(
+    `UPDATE videos 
+     SET course_id=?, title=?, youtube_url=?, description=? 
+     WHERE video_id=?`,
+    [course_id, title, youtube_url, description, video_id],
+    (error, data) => res.send(result.createResult(error, data))
+  )
+})
 
     pool.query(
         `UPDATE videos SET course_id=?,title=?,youtube_url=?,description=? WHERE video_id=?`,
